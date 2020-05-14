@@ -1,0 +1,6 @@
+# ignore regenerated files from autoreconf -fvi
+configure
+
+# ignore new files from autoreconf -fvi
+autom4te.cache/
+config.h.in~
