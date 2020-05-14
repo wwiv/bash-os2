@@ -50,6 +50,10 @@
 #  include <arpa/inet.h>
 #endif
 
+#if defined (__OS2__)
+#  include <libcx/net.h>
+#endif
+
 #include <bashansi.h>
 #include <bashintl.h>
 
