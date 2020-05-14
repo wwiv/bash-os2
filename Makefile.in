@@ -581,7 +581,7 @@ $(Program):  .build $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP)
 	$(RM) $@
 	$(PURIFY) $(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LDFLAGS) -o $(Program) $(OBJECTS) $(LIBS)
 	ls -l $(Program)
-	-$(SIZE) $(Program)
+#	-$(SIZE) $(Program)
 
 .build:	$(SOURCES) config.h Makefile version.h $(VERSPROG)
 	@echo
