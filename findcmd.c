@@ -284,7 +284,7 @@ find_user_command_internal (name, flags)
      const char *name;
      int flags;
 {
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(__OS2__)
   char *res, *dotexe;
 
   dotexe = (char *)xmalloc (strlen (name) + 5);
