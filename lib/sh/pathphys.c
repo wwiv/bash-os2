@@ -105,7 +105,7 @@ sh_physpath (path, flags)
 
   /* POSIX.2 says to leave a leading `//' alone.  On cygwin, we skip over any
      leading `x:' (dos drive name). */
-#if defined (__CYGWIN__)
+#if defined (__CYGWIN__) || defined(__OS2__)
   qbase = (ISALPHA((unsigned char)workpath[0]) && workpath[1] == ':') ? workpath + 3 : workpath + 1;
 #else
   qbase = workpath + 1;
@@ -214,7 +214,7 @@ error:
 	    {
 	      q = result;
 	      /* Duplicating some code here... */
-#if defined (__CYGWIN__)
+#if defined (__CYGWIN__) || defined(__OS2__)
 	      qbase = (ISALPHA((unsigned char)workpath[0]) && workpath[1] == ':') ? workpath + 3 : workpath + 1;
 #else
 	      qbase = workpath + 1;

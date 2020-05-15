@@ -269,7 +269,7 @@ typedef int QSFUNC ();
 /* Some useful definitions for Unix pathnames.  Argument convention:
    x == string, c == character */
 
-#if !defined (__CYGWIN__)
+#if !defined (__CYGWIN__) && !defined(__OS2__)
 #  define ABSPATH(x)	((x)[0] == '/')
 #  define RELPATH(x)	((x)[0] != '/')
 #else /* __CYGWIN__ */
@@ -280,7 +280,7 @@ typedef int QSFUNC ();
 #define ROOTEDPATH(x)	(ABSPATH(x))
 
 #define DIRSEP	'/'
-#if !defined (__CYGWIN__)
+#if !defined (__CYGWIN__) && !defined(__OS2__)
 #  define ISDIRSEP(c)	((c) == '/')
 #else
 #  define ISDIRSEP(c)	((c) == '/' || (c) == '\\')
