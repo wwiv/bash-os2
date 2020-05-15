@@ -74,15 +74,27 @@ get_sys_tmpdir ()
     return sys_tmpdir;
 #endif
 
+#ifdef __OS2__
+  sys_tmpdir = "/@unixroot/tmp";
+#else
   sys_tmpdir = "/tmp";
+#endif
   if (file_iswdir (sys_tmpdir))
     return sys_tmpdir;
 
+#ifdef __OS2__
+  sys_tmpdir = "/@unixroot/var/tmp";
+#else
   sys_tmpdir = "/var/tmp";
+#endif
   if (file_iswdir (sys_tmpdir))
     return sys_tmpdir;
 
+#ifdef __OS2__
+  sys_tmpdir = "/@unixroot/usr/tmp";
+#else
   sys_tmpdir = "/usr/tmp";
+#endif
   if (file_iswdir (sys_tmpdir))
     return sys_tmpdir;
 
