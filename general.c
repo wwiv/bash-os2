@@ -61,6 +61,11 @@ extern int errno;
 #  include <sys/cygwin.h>
 #endif
 
+#ifdef __OS2__
+#include <sys/socket.h>
+# define pipe(A) socketpair(AF_UNIX, SOCK_STREAM, 0, A)
+#endif
+
 static char *bash_special_tilde_expansions __P((char *));
 static int unquoted_tilde_word __P((const char *));
 static void initialize_group_array __P((void));

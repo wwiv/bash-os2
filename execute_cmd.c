@@ -106,6 +106,11 @@ extern int errno;
 #  include <mbstr.h>		/* mbschr */
 #endif
 
+#ifdef __OS2__
+#include <sys/socket.h>
+# define pipe(A) socketpair(AF_UNIX, SOCK_STREAM, 0, A)
+#endif
+
 extern int command_string_index;
 extern char *the_printed_command;
 extern time_t shell_start_time;
