@@ -5640,7 +5640,7 @@ static struct name_and_function special_vars[] = {
   { "HISTTIMEFORMAT", sv_histtimefmt },
 #endif
 
-#if defined (__CYGWIN__)
+#if defined (__CYGWIN__) || defined(__OS2__)
   { "HOME", sv_home },
 #endif
 
@@ -5906,7 +5906,7 @@ sv_winsize (name)
 
 /* Update the value of HOME in the export environment so tilde expansion will
    work on cygwin. */
-#if defined (__CYGWIN__)
+#if defined (__CYGWIN__) || defined(__OS2__)
 sv_home (name)
      char *name;
 {

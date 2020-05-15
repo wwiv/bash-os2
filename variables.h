@@ -426,7 +426,7 @@ extern void sv_hostfile __P((char *));
 extern void sv_winsize __P((char *));
 #endif
 
-#if defined (__CYGWIN__)
+#if defined (__CYGWIN__) || defined(__OS2__)
 extern void sv_home __P((char *));
 #endif
 
