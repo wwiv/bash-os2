@@ -4410,6 +4410,8 @@ xparse_dolparen (base, string, indp, flags)
   save_parser_state (&ps);
   save_input_line_state (&ls);
   orig_eof_token = shell_eof_token;
+  /* avoid echoing every substitution again */
+  echo_input_at_read = 0;
 #if defined (ALIAS) || defined (DPAREN_ARITHMETIC)
   saved_pushed_strings = pushed_string_list;	/* separate parsing context */
   pushed_string_list = (STRING_SAVER *)NULL;
