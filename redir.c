@@ -58,6 +58,11 @@ extern int errno;
 #  include "input.h"
 #endif
 
+#ifdef __OS2__
+#  include <fcntl.h>
+#  include <io.h>
+#endif
+
 #define SHELL_FD_BASE	10
 
 int expanding_redir;
@@ -465,6 +470,9 @@ here_document_to_fd (redirectee, ri)
       return (fd);
     }
 
+#ifdef __OS2__
+  setmode(fd, O_BINARY);
+#endif
   fchmod (fd, S_IRUSR | S_IWUSR);
   SET_CLOSE_ON_EXEC (fd);
 
@@ -486,6 +494,9 @@ here_document_to_fd (redirectee, ri)
   /* In an attempt to avoid races, we close the first fd only after opening
      the second. */
   /* Make the document really temporary.  Also make it the input. */
+#ifdef __OS2__
+  close (fd);
+#endif
   fd2 = open (filename, O_RDONLY|O_BINARY, 0600);
 
   if (fd2 < 0)
@@ -493,11 +504,14 @@ here_document_to_fd (redirectee, ri)
       r = errno;
       unlink (filename);
       free (filename);
+#ifndef __OS2__
       close (fd);
+#endif
       errno = r;
       return -1;
     }
 
+#ifndef __OS2__
   close (fd);
   if (unlink (filename) < 0)
     {
@@ -507,6 +521,7 @@ here_document_to_fd (redirectee, ri)
       errno = r;
       return (-1);
     }
+#endif
 
   free (filename);
 
