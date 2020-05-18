@@ -2089,7 +2089,11 @@ globword:
       /* Get the next directory from the path.  If there is none, then we
 	 are all done. */
       if (path == 0 || path[path_index] == 0 ||
+#ifdef __OS2__
+	  (current_path = extract_scolon_unit (path, &path_index)) == 0)
+#else
 	  (current_path = extract_colon_unit (path, &path_index)) == 0)
+#endif
 	return ((char *)NULL);
 
       searching_path = 1;

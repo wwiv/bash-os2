@@ -391,7 +391,11 @@ remember_mail_dates ()
       return;
     }
 
+#ifdef __OS2__
+  while (mailfile = extract_scolon_unit (mailpaths, &i))
+#else
   while (mailfile = extract_colon_unit (mailpaths, &i))
+#endif
     {
       mp = parse_mailpath_spec (mailfile);
       if (mp && *mp)

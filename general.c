@@ -69,6 +69,7 @@ extern int errno;
 static char *bash_special_tilde_expansions __P((char *));
 static int unquoted_tilde_word __P((const char *));
 static void initialize_group_array __P((void));
+static char *_extract_colon_unit __P((char *, int *, const char));
 
 /* A standard error message to use when getcwd() returns NULL. */
 const char * const bash_getcwd_errstr = N_("getcwd: cannot access parent directories");
@@ -978,9 +979,10 @@ printable_filename (fn, flags)
    return the next one pointed to by (P_INDEX), or NULL if there are no more.
    Advance (P_INDEX) to the character after the colon. */
 char *
-extract_colon_unit (string, p_index)
+_extract_colon_unit (string, p_index, delemiter)
      char *string;
      int *p_index;
+     const char delemiter;
 {
   int i, start, len;
   char *value;
@@ -999,10 +1001,10 @@ extract_colon_unit (string, p_index)
      `:'.  If I is 0, then the path has a leading colon.  Trailing colons
      are handled OK by the `else' part of the if statement; an empty
      string is returned in that case. */
-  if (i && string[i] == ':')
+  if (i && string[i] == delemiter)
     i++;
 
-  for (start = i; string[i] && string[i] != ':'; i++)
+  for (start = i; string[i] && string[i] != delemiter; i++)
     ;
 
   *p_index = i;
@@ -1021,6 +1023,23 @@ extract_colon_unit (string, p_index)
   return (value);
 }
 
+char *
+extract_colon_unit (string, p_index)
+     char *string;
+     int *p_index;
+{
+  return _extract_colon_unit(string, p_index, ':');
+}
+
+#ifdef __OS2__
+char *
+extract_scolon_unit (string, p_index)
+     char *string;
+     int *p_index;
+{
+  return _extract_colon_unit(string, p_index, ';');
+}
+#endif
 /* **************************************************************** */
 /*								    */
 /*		    Tilde Initialization and Expansion		    */

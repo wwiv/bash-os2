@@ -62,8 +62,13 @@
 
 /* The default value of the PATH variable. */
 #ifndef DEFAULT_PATH_VALUE
+#ifdef __OS2__
+#define DEFAULT_PATH_VALUE \
+  "/@unixroot/usr/local/bin;/@unixroot/usr/local/sbin;/@unixroot/usr/bin;/@unixroot/usr/sbin;."
+#else
 #define DEFAULT_PATH_VALUE \
   "/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:."
+#endif
 #endif
 
 /* If you want to unconditionally set a value for PATH in every restricted
@@ -73,8 +78,13 @@
 /* The value for PATH when invoking `command -p'.  This is only used when
    the Posix.2 confstr () function, or CS_PATH define are not present. */
 #ifndef STANDARD_UTILS_PATH
+#ifdef __OS2__
+#define STANDARD_UTILS_PATH \
+  "/@unixroot/usr/bin;/@unixroot/usr/sbin;/@unixroot/etc"
+#else
 #define STANDARD_UTILS_PATH \
   "/bin:/usr/bin:/sbin:/usr/sbin:/etc:/usr/etc"
+#endif
 #endif
 
 /* Default primary and secondary prompt strings. */

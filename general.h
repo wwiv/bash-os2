@@ -347,6 +347,9 @@ extern char *polite_directory_format __P((char *));
 extern char *trim_pathname __P((char *, int));
 extern char *printable_filename __P((char *, int));
 
+#ifdef __OS2__
+extern char *extract_scolon_unit __P((char *, int *));
+#endif
 extern char *extract_colon_unit __P((char *, int *));
 
 extern void tilde_initialize __P((void));

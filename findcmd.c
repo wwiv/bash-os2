@@ -311,7 +311,11 @@ get_next_path_element (path_list, path_index_pointer)
 {
   char *path;
 
+#ifdef __OS2__
+  path = extract_scolon_unit (path_list, path_index_pointer);
+#else
   path = extract_colon_unit (path_list, path_index_pointer);
+#endif
 
   if (path == 0)
     return (path);
@@ -385,6 +389,17 @@ search_for_command (pathname, flags)
 	path_list = 0;
 
       command = find_user_command_in_path (pathname, path_list, FS_EXEC_PREFERRED|FS_NODIRS);
+#if defined(__OS2__)
+      if (command == NULL)
+        {
+          char *dotexe;
+          dotexe = (char *)xmalloc (strlen (pathname) + 5);
+          strcpy (dotexe, pathname);
+          strcat (dotexe, ".exe");
+          command = find_user_command_in_path (dotexe, path_list, FS_EXEC_PREFERRED|FS_NODIRS);
+          free (dotexe);
+        }
+#endif
 
       if (command && hashing_enabled && temp_path == 0 && (flags & CMDSRCH_HASH))
 	{
