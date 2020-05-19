@@ -4277,7 +4277,11 @@ initialize_job_control (force)
 	      shell_pgrp = original_pgrp;
 	    }
 
+#ifdef __OS2__ // job control is not working, as tcgetpgrp is a noop
+	  job_control = 0;
+#else
 	  job_control = 1;
+#endif
 
 	  /* If (and only if) we just set our process group to our pid,
 	     thereby becoming a process group leader, and the terminal
@@ -4307,8 +4311,10 @@ initialize_job_control (force)
 	      job_control = 0;
 	    }
 	}
+#ifndef __OS2__ // we know it
       if (job_control == 0)
 	internal_error (_("no job control in this shell"));
+#endif
     }
 
 just_bail:
