@@ -5921,7 +5921,11 @@ process_substitute (string, open_for_read_in_child)
 
 #if !defined (HAVE_DEV_FD)
   /* Open the named pipe in the child. */
+#ifdef __OS2__
+  fd = open (pathname, open_for_read_in_child ? O_RDONLY|O_CREAT : O_WRONLY|O_CREAT);
+#else
   fd = open (pathname, open_for_read_in_child ? O_RDONLY : O_WRONLY);
+#endif
   if (fd < 0)
     {
       /* Two separate strings for ease of translation. */
