@@ -22,10 +22,18 @@
 #define _PATHNAMES_H_
 
 /* The default file for hostname completion. */
+#if defined(__OS2__)
+#define DEFAULT_HOSTS_FILE "/@unixroot/etc/hosts"
+#else
 #define DEFAULT_HOSTS_FILE "/etc/hosts"
+#endif
 
 /* The default login shell startup file. */
+#if defined(__OS2__)
+#define SYS_PROFILE "/@unxroot/etc/profile"
+#else
 #define SYS_PROFILE "/etc/profile"
+#endif
 
 /* The default location of the bash debugger initialization/startup file. */
 #define DEBUGGER_START_FILE	"@DEBUGGER_START_FILE@"
