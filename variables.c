@@ -248,6 +248,11 @@ static SHELL_VAR *assign_aliasvar __P((SHELL_VAR *,  char *, arrayind_t, char *)
 static SHELL_VAR *get_funcname __P((SHELL_VAR *));
 static SHELL_VAR *init_funcname_var __P((void));
 
+#if defined(__OS2__)
+static SHELL_VAR *os2_libpath_assign __P((SHELL_VAR *, char *, arrayind_t, char *));
+static SHELL_VAR *os2_libpath_refresh_value __P((SHELL_VAR *));
+#endif
+
 static void initialize_dynamic_variables __P((void));
 
 static SHELL_VAR *bind_invalid_envvar __P((const char *, char *, int));
@@ -1669,6 +1674,66 @@ get_dirstack (self)
 }
 #endif /* PUSHD AND POPD && ARRAY_VARS */
 
+#if defined(__OS2__)
+# define INCL_BASE
+# include <os2.h>
+
+static SHELL_VAR *
+os2_libpath_assign (self, value, ind, key)
+     SHELL_VAR *self;
+     char *value;
+     arrayind_t ind;
+     char *key;
+{
+  /* set */
+  ULONG flags;
+  char ch = self->name[0];
+  if (ch == 'B' || ch == 'b')
+    flags = BEGIN_LIBPATH;
+  else if (ch == 'E' || ch == 'e')
+    flags = END_LIBPATH;
+  else
+    flags = LIBPATHSTRICT;
+  DosSetExtLIBPATH (value, flags);
+
+  /* refresh the value. */
+  return os2_libpath_refresh_value (self);
+}
+
+static SHELL_VAR *
+os2_libpath_refresh_value (self)
+     SHELL_VAR *self;
+{
+  VUNSETATTR (self, att_exported);
+
+  /* allocate 2 KB once and assume nobody messes with it.
+    (2KB is a bit too much for LIBPATHSTRICT, but so what.) */
+  if (var_isnull (self))
+    {
+      char *newval = xmalloc (2048);
+      var_setvalue (self, newval);
+    }
+
+    ULONG flags;
+    char ch = self->name[0];
+    if (ch == 'B' || ch == 'b')
+      flags = BEGIN_LIBPATH;
+    else if (ch == 'E' || ch == 'e')
+      flags = END_LIBPATH;
+    else
+      {
+        /* The API writes a single value, add '\0'. */
+        memset (self->value, 0, 32);
+        flags = LIBPATHSTRICT;
+      }
+    if (DosQueryExtLIBPATH (self->value, flags))
+      {
+        self->value[0] = '\0';
+      }
+  return self;
+}
+#endif /* __OS2__ */
+
 #if defined (ARRAY_VARS)
 /* We don't want to initialize the group set with a call to getgroups()
    unless we're asked to, but we only want to do it once. */
@@ -1952,6 +2017,18 @@ initialize_dynamic_variables ()
 #  if defined (ALIAS)
   v = init_dynamic_assoc_var ("BASH_ALIASES", get_aliasvar, assign_aliasvar, att_nofree);
 #  endif
+#endif
+
+#ifdef __OS2__
+  INIT_DYNAMIC_VAR ("BEGINLIBPATH", (char *)NULL, NULL, os2_libpath_assign);
+  os2_libpath_refresh_value (v);
+  VSETATTR (v, att_special | att_nounset | att_exported);
+  INIT_DYNAMIC_VAR ("ENDLIBPATH", (char *)NULL, NULL, os2_libpath_assign);
+  os2_libpath_refresh_value (v);
+  VSETATTR (v, att_special | att_nounset | att_exported);
+  INIT_DYNAMIC_VAR ("LIBPATHSTRICT", (char *)NULL, NULL, os2_libpath_assign);
+  os2_libpath_refresh_value (v);
+  VSETATTR (v, att_special | att_nounset | att_exported);
 #endif
 
   v = init_funcname_var ();
@@ -5907,6 +5984,7 @@ sv_winsize (name)
 /* Update the value of HOME in the export environment so tilde expansion will
    work on cygwin. */
 #if defined (__CYGWIN__) || defined(__OS2__)
+void
 sv_home (name)
      char *name;
 {
