@@ -1676,6 +1676,7 @@ get_dirstack (self)
 
 #if defined(__OS2__)
 # define INCL_BASE
+# include <assert.h>
 # include <os2.h>
 
 static SHELL_VAR *
@@ -1692,8 +1693,13 @@ os2_libpath_assign (self, value, ind, key)
     flags = BEGIN_LIBPATH;
   else if (ch == 'E' || ch == 'e')
     flags = END_LIBPATH;
-  else
+  else if (ch == 'L' || ch == 'l')
     flags = LIBPATHSTRICT;
+  else
+    {
+      assert(0);
+      return (self);
+    }
   DosSetExtLIBPATH (value, flags);
 
   /* refresh the value. */
@@ -1708,28 +1714,31 @@ os2_libpath_refresh_value (self)
 
   /* allocate 2 KB once and assume nobody messes with it.
     (2KB is a bit too much for LIBPATHSTRICT, but so what.) */
-  if (var_isnull (self))
+  FREE (value_cell (self));
+  char *newval = xmalloc (2048);
+  var_setvalue (self, newval);
+
+  ULONG flags;
+  char ch = self->name[0];
+  if (ch == 'B' || ch == 'b')
+    flags = BEGIN_LIBPATH;
+  else if (ch == 'E' || ch == 'e')
+    flags = END_LIBPATH;
+  else if (ch == 'L' || ch == 'l')
     {
-      char *newval = xmalloc (2048);
-      var_setvalue (self, newval);
+      /* The API writes a single value, add '\0'. */
+      memset (self->value, 0, 32);
+      flags = LIBPATHSTRICT;
+    }
+  else
+    assert (0);
+
+  if (DosQueryExtLIBPATH (self->value, flags))
+    {
+      assert (0);
+      self->value[0] = '\0';
     }
 
-    ULONG flags;
-    char ch = self->name[0];
-    if (ch == 'B' || ch == 'b')
-      flags = BEGIN_LIBPATH;
-    else if (ch == 'E' || ch == 'e')
-      flags = END_LIBPATH;
-    else
-      {
-        /* The API writes a single value, add '\0'. */
-        memset (self->value, 0, 32);
-        flags = LIBPATHSTRICT;
-      }
-    if (DosQueryExtLIBPATH (self->value, flags))
-      {
-        self->value[0] = '\0';
-      }
   return self;
 }
 #endif /* __OS2__ */
@@ -2019,7 +2028,7 @@ initialize_dynamic_variables ()
 #  endif
 #endif
 
-#ifdef __OS2__
+#if defined (__OS2__)
   INIT_DYNAMIC_VAR ("BEGINLIBPATH", (char *)NULL, NULL, os2_libpath_assign);
   os2_libpath_refresh_value (v);
   VSETATTR (v, att_special | att_nounset | att_exported);
