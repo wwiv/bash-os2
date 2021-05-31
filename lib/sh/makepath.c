@@ -72,7 +72,7 @@ sh_makepath (path, dir, flags)
      int flags;
 {
   int dirlen, pathlen;
-  char *ret, *xpath, *xdir, *r, *s;
+  char *ret, *xpath, *xdir, *r, *s, *os2r;
 
   if (path == 0 || *path == '\0')
     {
@@ -122,6 +122,16 @@ sh_makepath (path, dir, flags)
   s = xdir;
   while (*r++ = *s++)
     ;
+#ifdef __OS2__
+  /* Always use / in OS/2 bash */
+  os2r = ret;
+  while (*os2r) {
+    if (*os2r == '\\') {
+      *os2r = '/';
+    }
+    ++os2r;
+  }
+#endif
   if (xpath != path && xpath != nullpath)
     free (xpath);
   return (ret);
